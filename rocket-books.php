@@ -37,6 +37,16 @@ if ( ! defined( 'WPINC' ) ) {
  */
 define( 'ROCKET_BOOKS_VERSION', '1.0.0' );
 
+define( 'ROCKET_BOOKS_NAME', 'rocket-books' );
+
+// plugin directory Path
+
+define('ROCKET_BOOKS_BASE_DIR' , plugin_dir_path(__FILE__));
+
+//Plugin url Path
+
+define('ROCKET_BOOKS_PLUGIN_URL' , plugin_dir_url(__FILE__));
+
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-rocket-books-activator.php
@@ -80,3 +90,11 @@ function run_rocket_books() {
 
 }
 run_rocket_books();
+
+add_action( 'init', 'codex_book_init' );
+/**
+ * Register a book post type.
+ *
+ * @link http://codex.wordpress.org/Function_Reference/register_post_type
+ */
+

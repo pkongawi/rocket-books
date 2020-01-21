@@ -72,12 +72,22 @@ class Rocket_Books {
 		} else {
 			$this->version = '1.0.0';
 		}
+		
+		if ( defined( 'ROCKET_BOOKS_NAME' ) ) {
+			$this->plugin_name = ROCKET_BOOKS_NAME;
+		} else {
+			$this->plugin_name = 'rocket-books';
+		}
+		
 		$this->plugin_name = 'rocket-books';
+        
 
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
+        
+        $this->define_post_type_hooks();
 
 	}
 
@@ -121,6 +131,12 @@ class Rocket_Books {
 		 * side of the site.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-rocket-books-public.php';
+        
+        /**
+		 * The class responsible for registering cutom post types
+		 * side of the site.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-rocket-books-post-types.php';
 
 		$this->loader = new Rocket_Books_Loader();
 
@@ -172,6 +188,8 @@ class Rocket_Books {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+        //$this->loader->add_action('init', $plugin_public, 'register_book_post_type');
+        //$this->loader->add_action('init', $plugin_public, 'register_taxonomy_genre');
 
 	}
 
@@ -214,5 +232,43 @@ class Rocket_Books {
 	public function get_version() {
 		return $this->version;
 	}
+    
+    /**
+	 * Defining all action and filter hooks
+	 *
+	 * 
+	 */
+    
+    public function define_post_type_hooks(){
+        
+        $plugin_post_types = new Rocket_Books_Post_types($this->get_plugin_name(), $this->get_version());
+        
+        $this->loader->add_action( 'init', $plugin_post_types, 'init' );
+        
+        $this->loader->add_filter( 'the_content', $plugin_post_types, 'content_single_book' );
+        
+        $this->loader->add_filter( 'single_template', $plugin_post_types, 'single_template_book' );
+        
+        $this->loader->add_filter( 'archive_template', $plugin_post_types, 'archive_template_book' );
+        
+        
+        
+              
+   //   $this->loader->add_action( 'add_meta_boxes_book', $plugin_post_types, 'register_metabox_book', 10, 1 );
+        
+     /*** Load all the metaboxes **/
+          
+    //  $this->loader->add_action( 'add_meta_boxes', $plugin_post_types, 'register_metabox_book', 10, 2 );
+        
+   //   $this->loader->add_action( 'do_meta_boxes', $plugin_post_types, 'register_metabox_book', 10, 1 );
+        
+         /**
+	 * Save Metabox for CPT
+	 *
+	 * 
+	 */
+        
+        $this->loader->add_action( 'save_post_book', $plugin_post_types , 'metabox_save_book', 10, 3);
+    }
 
 }

@@ -6,12 +6,10 @@
  * @link       https://booksshelf.com
  * @since      1.0.0
  *
- * @package    Rocket_Books
- * @subpackage Rocket_Books/public
  */
 
 /**
- * The public-facing functionality of the plugin.
+ * Functionality for our custom post types
  *
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the public-facing stylesheet and JavaScript.
@@ -20,7 +18,7 @@
  * @subpackage Rocket_Books/public
  * @author     Patrick Kongawi  <hello@patrickkongawi.com>
  */
-class Rocket_Books_Public {
+class Rocket_Books_Post_Types {
 
 	/**
 	 * The ID of this plugin.
@@ -39,6 +37,8 @@ class Rocket_Books_Public {
 	 * @var      string    $version    The current version of this plugin.
 	 */
 	private $version;
+    
+    private $template_loader;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -51,60 +51,25 @@ class Rocket_Books_Public {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-
-	}
-
-	/**
-	 * Register the stylesheets for the public-facing side of the site.
+        
+        $this->template_loader = $this->get_template_loader();
+    /**
+	 *Hooked into the init action hook
 	 *
-	 * @since    1.0.0
 	 */
-	public function enqueue_styles() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Rocket_Books_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Rocket_Books_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/rocket-books-public.css', array(), $this->version, 'all' );
-
-	}
-
-	/**
-	 * Register the JavaScript for the public-facing side of the site.
+    }
+        
+    public function init(){
+        
+        $this->register_cpt_book();
+        $this->register_taxonomy_genre();
+    }
+    /**
+	 *Register custom post type
 	 *
-	 * @since    1.0.0
 	 */
-	public function enqueue_scripts() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Rocket_Books_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Rocket_Books_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/rocket-books-public.js', array( 'jquery' ), $this->version, false );
-
-	}
-    
-    	/**
-		 * Register custom post type and documentation
-		 *
-		 */
-    public function register_book_post_type(){
+        
+    public function register_cpt_book(){
         
         register_post_type('book', array(
         'description'        => __( 'Books', 'rocket-books' ),
@@ -139,8 +104,8 @@ class Rocket_Books_Public {
         'capabilities'          => array(),
         'map_meta_cap'          => null,
         'supports'              => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'comments' ),
-        'register_meta_box_cb'  => array(),
-        'taxonomies'            => array(),
+        'register_meta_box_cb'  => array($this, 'register_metabox_book'),
+        'taxonomies'            => array('genre'),
 		'has_archive'           => true,
         'rewrite'               => array( 'slug' => 'book', 'with_front' =>true, 'feeds' => false, 'pages' =>true, ),
         'query_var'             => true,
@@ -148,15 +113,17 @@ class Rocket_Books_Public {
         'show_in_rest'          => true,
 	
 	));
-
+        
     }
-	/**
-		 * Register custom taxonomy 
-		 *
-		 */
     
+    /**
+	 *Register Taxonomy
+	 *
+	 */
+        
     public function register_taxonomy_genre(){
-        register_taxonomy( 'genre', array('book'), array(
+        
+          register_taxonomy( 'genre', array('book'), array(
         'description'                   => 'Genre',
         'labels'                        => array(
         'name'                          => _x( 'Genres', 'post type general name', 'rocket-books' ),
@@ -181,8 +148,112 @@ class Rocket_Books_Public {
         'query_var'             => 'genre',
         'rewrite'               => array( 'slug' => 'genre', 'with_front' => true, 'hierarchical'  => true, ),
         'capabilities'          => array(),
+        'show_in_rest'          => true,
         ));
-}
+        
+    }
     
+      /**
+	 *The content of the custom post type
+	 *
+	 */
     
-}
+    public function content_single_book($the_content){
+        
+        //filter contens for just Books
+        
+        if ( in_the_loop() && is_singular( 'book' )) {
+            
+        //  return "<pre>" . $the_content . "</pre>";
+        ob_start();
+        include ROCKET_BOOKS_BASE_DIR . 'templates/book-content.php';
+        return ob_get_clean();
+            
+        }
+        
+        return $the_content;
+        
+    }
+    
+    /***Single Template for CPT: book */
+    public function single_template_book($template) {
+       if ( is_singular( 'book' )) {
+        // Template for CPT book
+         
+        return $this->template_loader->get_template_part( 'single', 'book', false );
+       } 
+         return $template;
+    }
+    
+        /***Single Template for archive template */
+    public function archive_template_book($template) {
+       if ( is_post_type_archive('book')  ||  is_tax( 'genre' )) {
+           
+        // Template for Archive book
+           
+        return $this->template_loader->get_template_part( 'archive', 'book', false );
+       } 
+         return $template;
+    }
+      
+    public function get_template_loader(){
+        
+        require_once ROCKET_BOOKS_BASE_DIR . 'public/class-rocket-books-template-loader.php';
+        return new Rocket_Books_Template_Loader();
+        
+    }
+    
+      /**
+	 *Register metaboxes for CPT
+	 *
+	 */
+    
+    public function register_metabox_book($post){
+        
+        $is_gutenberge_active = (
+        function_exists('use_block_editor_for_post_type') &&
+        use_block_editor_for_post_type(get_post_type())
+        );
+        
+        add_meta_box(
+        'book-details',
+        __('Book Details', 'rocket-books'),
+         array($this, 'book_metabox_display_cb'),
+        'book',
+        ($is_gutenberge_active) ? 'side' : 'normal',
+        'default'
+            
+        );
+        
+    }
+    
+       /**
+	 *Display Metabox for custom post types.  
+	 *
+	 */
+    public function book_metabox_display_cb($post) {
+        
+      //  echo "hello";
+    ?>
+    <label for="rbr-book-pages"><?php _e( 'Number of Pages', 'rocket-books' ) ?></label>
+    <input type="text" name="rbr-book-pages" class="widefat">
+    <?php
+        
+    }
+    
+    /**
+	 *Saving custom fields for CPT  
+	 *
+	 */
+    
+    public function metabox_save_book($post_id, $post, $update){
+        
+   // var_export($_POST); die();
+    var_export($_POST['rbr-book-pages']); die();
+    update_post_meta(get_the_ID(), 'rbr_book_page');
+        
+    }
+    
+	}    
+    
+
