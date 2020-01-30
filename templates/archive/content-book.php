@@ -19,19 +19,10 @@
 	<div class="book-entry-content">
 		<?php
 			/* translators: %s: Name of current post */
-            the_excerpt();
+           // the_excerpt();
+        include ROCKET_BOOKS_BASE_DIR . 'templates/book-meta.php';
+        ?>
 
-			wp_link_pages(
-				array(
-					'before'      => '<div class="page-links"><span class="page-links-title">' . __( 'Pages:', 'twentysixteen' ) . '</span>',
-					'after'       => '</div>',
-					'link_before' => '<span>',
-					'link_after'  => '</span>',
-					'pagelink'    => '<span class="screen-reader-text">' . __( 'Page', 'twentysixteen' ) . ' </span>%',
-					'separator'   => '<span class="screen-reader-text">, </span>',
-				)
-			);
-			?>
 	</div><!-- .entry-content -->
 
 	<footer class="book-entry-footer">
