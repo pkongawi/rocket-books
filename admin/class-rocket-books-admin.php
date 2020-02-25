@@ -99,5 +99,157 @@ class Rocket_Books_Admin {
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/rocket-books-admin.js', array( 'jquery' ), $this->version, false );
 
 	}
+    
+    /**
+	 * Add admin menu for our plugin
+	 *
+	 * 
+	 */
+    public function add_admin_menu(){
+        
+        //Top Level Menu
+        //add_menu_page(
+        
+        //'Rocket Books Settings',
+        //'Rocket Books',
+        //'manage_options',
+        //'rocket-books',
+        //array($this, 'admin_page_display'),
+        //'dashicons-chart-pie',
+        //60   
+        //);
+        
+        //Sub Menu 
+        //add_options_page(
+        
+        //'Rocket Books Settings',
+        //'Rocket Books',
+        //'manage_options',
+        //'rocket-books',
+        //array($this, 'admin_page_display')  
+        //);
+        
+        add_submenu_page(
+        'edit.php?post_type=book',
+        'Rocket Books Settings',
+        'Rocket Books',
+        'manage_options',
+        'rocket-books',
+         array($this, 'admin_page_display')  
+        );
+    }
+    
+     /**
+	 * Admin page display
+	 *
+	 */
+    
+   public function admin_page_display(){
+  //Old method of saving
+  //   include 'partials/rocket-books-admin-display-form-method.php';
+       
+  // Settings api
+       
+       include 'partials/rocket-books-admin-display.php';
+   }
+    
+  //All the hooks for admin_init
+  public function admin_init(){
+    
+      //Add settings section
+      
+      $this->add_settings_section();
+      
+      //Add settings fields
+      
+      $this->add_settings_field();
+      
+      //Save settings
+      
+      $this->save_fields();
+  }
+     //Add setting section for plugin options
+  public function add_settings_section(){
+      
+      add_settings_section(
+      'rbr-general-section',
+      'General Settings',
+       function(){
+           echo '<p>These are general setting for plugin</p>';
+       },
+      'rbr-settings-page'
+      );
+      
+      //Advance Section
+      add_settings_section(
+      'rbr-advance-section',
+      'Advance Settings',
+       function(){
+           echo '<p>These are advance setting for plugin</p>';
+       },
+      'rbr-settings-page'
+      );
+      
+  }
+    // add settings fileds
+  public function add_settings_field(){
+      
+      add_settings_field(
+      'rbr_test_field',
+      'Test Field',
+      function() {
+          echo '<input type="text" name="rbr_test_field" value=" '.  esc_html(get_option('rbr_test_field'))  .' " />';
+      },
+      'rbr-settings-page',
+      'rbr-general-section'
+      );
+      
+      
+      //advanced fields
+      add_settings_field(
+      'rbr_advance_field1',
+      'Advance Field 1',
+      function() {
+          echo '<input type="text" name="rbr_advance_field1" value=" '.  esc_html(get_option('rbr_advance_field1'))  .' " />';
+      },
+      'rbr-settings-page',
+      'rbr-advance-section'
+      );
+      
+      
+      add_settings_field(
+      'rbr_advance_field2',
+      'Advance Field 2',
+      function() {
+          echo '<input type="text" name="rbr_advance_field2" value=" '.  esc_html(get_option('rbr_advance_field2'))  .' " />';
+      },
+      'rbr-settings-page',
+      'rbr-advance-section'
+      );
+      
+  }
+    // save settings fields
+  public function save_fields(){
+      register_setting(
+      'rbr-settings-page-options-group',
+      'rbr_test_field',
+      ''
+      );
+      
+       register_setting(
+      'rbr-settings-page-options-group',
+      'rbr_advance_field1',
+      ''
+      );
+      
+       register_setting(
+      'rbr-settings-page-options-group',
+      'rbr_advance_field2',
+      ''
+      );
+  }
 
 }
+
+
+

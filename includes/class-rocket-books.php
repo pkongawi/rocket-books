@@ -133,10 +133,14 @@ class Rocket_Books {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-rocket-books-public.php';
         
         /**
-		 * The class responsible for registering cutom post types
-		 * side of the site.
+		 * Requiring CMB2 init file for meta boxes
+		 * 
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-rocket-books-post-types.php';
+        
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'vendor/CMB2/init.php';
+        
+        
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-rocket-books-post-types.php';
 
 		$this->loader = new Rocket_Books_Loader();
 
@@ -172,7 +176,10 @@ class Rocket_Books {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-
+        
+        $this->loader->add_action( 'admin_menu', $plugin_admin , 'add_admin_menu');
+        
+        $this->loader->add_action( 'admin_init', $plugin_admin , 'admin_init');
 	}
 
 	/**
@@ -268,7 +275,11 @@ class Rocket_Books {
 	 * 
 	 */
         
-        $this->loader->add_action( 'save_post_book', $plugin_post_types , 'metabox_save_book', 10, 3);
+   //    $this->loader->add_action( 'save_post_book', $plugin_post_types , 'metabox_save_book', 10, 3);
+        
+        
+        $this->loader->add_action( 'cmb2_admin_init', $plugin_post_types, 'register_cmb2_metabox_book' );
+        
     }
 
 }
