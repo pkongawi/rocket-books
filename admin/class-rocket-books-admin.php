@@ -194,38 +194,85 @@ class Rocket_Books_Admin {
     // add settings fileds
   public function add_settings_field(){
       
+      //advanced fields
       add_settings_field(
       'rbr_test_field',
       'Test Field',
-      function() {
-          echo '<input type="text" name="rbr_test_field" value=" '.  esc_html(get_option('rbr_test_field'))  .' " />';
-      },
+       array( $this, 'markup_text_fields_cb' ),
       'rbr-settings-page',
-      'rbr-general-section'
+      'rbr-general-section',
+       array(
+       'name' => 'rbr_test_field',
+       'value' => get_option('rbr_test_field')
+       )
       );
       
+       //advanced fields
+      add_settings_field(
+      'rbr_archive_column',
+      'Archive Columns',
+       array( $this, 'markup_select_fields_cb' ),
+      'rbr-settings-page',
+      'rbr-general-section',
+       array(
+       'name' => 'rbr_archive_column',
+       'value' => get_option('rbr_archive_column'),
+       'options' =>array(
+           'column-two'=> __('Two Columns', 'rocket-books'),
+           'column-three'=> __('Three Columns', 'rocket-books'),
+           'column-four'=> __('Four Columns', 'rocket-books'),
+           'column-five'=> __('Five Columns', 'rocket-books'),
+       )
+       )
+      );
       
       //advanced fields
       add_settings_field(
       'rbr_advance_field1',
       'Advance Field 1',
-      function() {
-          echo '<input type="text" name="rbr_advance_field1" value=" '.  esc_html(get_option('rbr_advance_field1'))  .' " />';
-      },
+       array( $this, 'markup_text_fields_cb' ),
       'rbr-settings-page',
-      'rbr-advance-section'
+      'rbr-advance-section',
+       array(
+       'name' => 'rbr_advance_field1',
+       'value' => get_option('rbr_advance_field1')
+       )
       );
       
-      
+      //advanced fields
       add_settings_field(
       'rbr_advance_field2',
       'Advance Field 2',
-      function() {
-          echo '<input type="text" name="rbr_advance_field2" value=" '.  esc_html(get_option('rbr_advance_field2'))  .' " />';
-      },
+       array( $this, 'markup_text_fields_cb' ),
       'rbr-settings-page',
-      'rbr-advance-section'
+      'rbr-advance-section',
+       array(
+       'name' => 'rbr_advance_field2',
+       'value' => get_option('rbr_advance_field2')
+       )
       );
+      
+      //advanced fields example
+      //add_settings_field(
+      //'rbr_advance_field1',
+      //'Advance Field 1',
+      //function() {
+//  echo '<input type="text" name="rbr_advance_field1" value=" '.  esc_html(get_option('rbr_advance_field1'))  .' " />';
+      //},
+      //'rbr-settings-page',
+      //'rbr-advance-section'
+      //);
+      
+      //advanced fields
+      //add_settings_field(
+      //'rbr_advance_field2',
+      //'Advance Field 2',
+      //function() {
+// echo '<input type="text" name="rbr_advance_field2" value=" '.  esc_html(get_option('rbr_advance_field2'))  .' " />';
+      // },
+      //'rbr-settings-page',
+      //'rbr-advance-section'
+      //);
       
   }
     // save settings fields
@@ -233,22 +280,77 @@ class Rocket_Books_Admin {
       register_setting(
       'rbr-settings-page-options-group',
       'rbr_test_field',
-      ''
+      array (
+       'sanitize_callback' => 'sanitize_text_field'
+      )
       );
       
        register_setting(
       'rbr-settings-page-options-group',
       'rbr_advance_field1',
-      ''
+       array (
+       'sanitize_callback' => 'sanitize_text_field'
+      )
       );
       
        register_setting(
       'rbr-settings-page-options-group',
       'rbr_advance_field2',
-      ''
+        array (
+       'sanitize_callback' => 'absint'
+      )
+      );
+      
+       register_setting(
+      'rbr-settings-page-options-group',
+      'rbr_archive_column'
       );
   }
 
+    public function markup_text_fields_cb($args) {
+        
+        if(! is_array($args)) {
+            return null;
+        }
+        $name = (isset($args['name'])) ? esc_html($args['name'] ) : '';
+        $value = (isset($args['value'])) ? esc_html($args['value']) : '';
+        ?>
+        <input type="text" name="<?php echo $name ?>" value="<?php echo $value ?>" class="field-<?php echo $name ?>" />
+        <?php 
+    }
+    
+    public function markup_select_fields_cb($args){
+        
+            if(! is_array($args)) {
+            return null;
+        }
+        $name = (isset($args['name'])) ? esc_html($args['name'] ) : '';
+        $value = (isset($args['value'])) ? esc_html($args['value']) : '';
+        $options = ( isset($args['options']) && is_array($args['options']) ) ? $args['options'] : array()
+        ?>
+        <select name="<?php echo $name ?>" class="field-<?php echo $name ?>">
+        
+        <?php  
+        foreach ($options as $option_key => $option_label){
+        echo "<option value='{$option_key}' ". selected($option_key, $value) ." >{$option_label}</option>";    
+        }      
+            ?>
+        
+        </select>
+        <?php 
+        
+    }
+    
+    //add plugin links
+    public function add_plugin_action_links($links){
+        
+        $links[] = '<a href="'. esc_url( get_admin_url(null, 'edit.php?post_type=book&page=rocket-books') ) .'">Settings</a>';
+        
+       // $links[] = '<a href="http://wp-buddy.com" target="_blank">More plugins by WP-Buddy</a>';
+        
+        return $links;
+    }
+    
 }
 
 

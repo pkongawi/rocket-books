@@ -180,6 +180,9 @@ class Rocket_Books {
         $this->loader->add_action( 'admin_menu', $plugin_admin , 'add_admin_menu');
         
         $this->loader->add_action( 'admin_init', $plugin_admin , 'admin_init');
+        
+        // hooks for plugin action links
+        $this->loader->add_action( 'plugin_action_links_' . plugin_basename(ROCKET_BOOKS_BASE_FILE), $plugin_admin , 'add_plugin_action_links');
 	}
 
 	/**

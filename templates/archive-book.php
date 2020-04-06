@@ -16,6 +16,12 @@
  * @since Twenty Sixteen 1.0
  */
 
+//delete_option('rbr_archive_column');
+//use the get_option method, call the rbr_archive_column key which get the saved output
+$archive_columns = get_option('rbr_archive_column');
+// if the select column option is empty set default to 3 three column
+$archive_columns = (! empty($archive_columns) ) ? $archive_columns : 'column-three';
+
 get_header(); ?>
 
 		<?php if ( have_posts() ) : ?>
@@ -27,7 +33,7 @@ get_header(); ?>
 				?>
 			</header><!-- .page-header -->
             
-            <div class="cpt-card column-three" >
+            <div class="cpt-cards <?php echo sanitize_html_class($archive_columns) ?>" >
             
 			<?php
 			// Start the Loop.

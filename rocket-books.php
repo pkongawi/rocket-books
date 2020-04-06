@@ -39,6 +39,8 @@ define( 'ROCKET_BOOKS_VERSION', '1.0.0' );
 
 define( 'ROCKET_BOOKS_NAME', 'rocket-books' );
 
+define( 'ROCKET_BOOKS_BASE_FILE', __FILE__ );
+
 // plugin directory Path
 
 define('ROCKET_BOOKS_BASE_DIR' , plugin_dir_path(__FILE__));
@@ -91,7 +93,7 @@ function run_rocket_books() {
 }
 run_rocket_books();
 
-add_action( 'init', 'codex_book_init' );
+//add_action( 'init', 'codex_book_init' );
 /**
  * Register a book post type.
  *
