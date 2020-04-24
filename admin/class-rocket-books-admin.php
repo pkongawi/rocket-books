@@ -351,6 +351,83 @@ class Rocket_Books_Admin {
         return $links;
     }
     
+    //add helper function to call settings page 
+    public function plugin_menu_settings_using_helper(){
+    require_once ROCKET_BOOKS_BASE_DIR . 'vendor/boo-settings-helper/class-boo-settings-helper.php';
+        $rocket_books_settings = array(
+        'tabs'   => true,
+        'prefix' => 'rbr_',
+        'menu' => array(
+            'slug' => 'rocket-books',
+            'page_title' => __('Rocket Books Settings', 'rocket-books'),
+            'menu_title' => __('Rocket Books', 'rocket-books'),
+            'parent'     => 'edit.php?post_type=book',
+            'submenu'    => true
+        ),
+        'sections' => array(
+            //General Section
+            array(
+                'id'    => 'rbr_general_section',
+                'title' => __('General Section', 'rocket-books'),
+                'desc'  => __('These are general settings', 'rocket-books'), 
+            ),
+            array(
+                //Advance Section
+                'id'    => 'rbr_advance_section',
+                'title' => __('Advance Section', 'rocket-books'),
+                'desc'  => __('These are advance settings', 'rocket-books'), 
+            )
+        ),
+        'fields' => array(
+            //fields for general section 
+            'rbr_general_section' => array(
+                array(
+                    'id'    => 'test_field',
+                    'label' => __('Test Field', 'rocket-books'),
+                    'sanitize_callback' => 'absint',
+                ),
+                array(
+                    'id'    => 'archive_column',
+                    'label' => __('Archive Column', 'rocket-books'),
+                    'type'  => 'select',
+                    'options' =>array(
+                       'column-two'=> __('Two Columns', 'rocket-books'),
+                       'column-three'=> __('Three Columns', 'rocket-books'),
+                       'column-four'=> __('Four Columns', 'rocket-books'),
+                       'column-five'=> __('Five Columns', 'rocket-books'),
+                    )
+                    
+                ),
+                
+                
+            //add additional fields
+                
+                
+            ),
+            
+            //fields for advance section 
+            'rbr_advance_section' => array(
+                array(
+                    'id'    => 'advance_field1',
+                    'label' => __('Advance Field 1', 'rocket-books'),
+                ),
+                array(
+                    'id'    => 'advance_field2',
+                    'label' => __('Advance Field 2', 'rocket-books'),
+                )
+            )
+        ),
+        
+        //adding links
+        	'links'    => array(
+			'plugin_basename' => plugin_basename( ROCKET_BOOKS_BASE_FILE ),
+			'action_links'    => true,
+		),
+            
+        );
+        new Boo_Settings_Helper($rocket_books_settings);
+    }
+    
 }
 
 

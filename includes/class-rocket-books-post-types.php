@@ -52,7 +52,7 @@ class Rocket_Books_Post_Types {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
         
-        $this->template_loader = $this->get_template_loader();
+        $this->template_loader = Rocket_Books_Global::template_loader();
     /**
 	 *Hooked into the init action hook
 	 *
@@ -199,9 +199,10 @@ class Rocket_Books_Post_Types {
       
     public function get_template_loader(){
         
-        require_once ROCKET_BOOKS_BASE_DIR . 'public/class-rocket-books-template-loader.php';
-        return new Rocket_Books_Template_Loader();
+        //require_once ROCKET_BOOKS_BASE_DIR . 'public/class-rocket-books-template-loader.php';
+        //return new Rocket_Books_Template_Loader();
         
+        return Rocket_Books_Global::template_loader();
     }
     
       /**
