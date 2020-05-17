@@ -88,6 +88,7 @@ class Rocket_Books {
 		$this->define_public_hooks();
         
         $this->define_post_type_hooks();
+        $this->define_shortcode_hooks();
 
 	}
 
@@ -118,6 +119,13 @@ class Rocket_Books {
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
+		 
+		   require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/helper-functions.php';
+		/**
+		 * Contains helper function for the single post method
+		 * 
+		 */
+		 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-rocket-books-loader.php';
 
 		/**
@@ -147,6 +155,8 @@ class Rocket_Books {
         
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-rocket-books-post-types.php';
 
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-rocket-books-shortcodes.php';
+		
 		$this->loader = new Rocket_Books_Loader();
 
 	}
@@ -293,6 +303,25 @@ class Rocket_Books {
         
         $this->loader->add_action( 'cmb2_admin_init', $plugin_post_types, 'register_cmb2_metabox_book' );
         
+    }
+    
+    /**
+     * Defining all shortcodes for the plugin
+     **/
+    
+    public function define_shortcode_hooks(){
+        
+        $plugin_shortcodes = new Rocket_Books_Shortcodes(
+        $this->get_plugin_name(),
+        $this->get_version()
+        );
+        
+        /**
+         * Adding shortcodes
+         * */
+        
+        add_shortcode( 'book_list', array($plugin_shortcodes, 'book_list') );
+  
     }
 
 }
