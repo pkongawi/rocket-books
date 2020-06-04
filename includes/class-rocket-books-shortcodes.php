@@ -58,10 +58,20 @@ class Rocket_Books_Shortcodes {
 
     public function book_list($atts, $content){
         
+        $atts = shortcode_atts(
+            
+            array(
+                'limit' => get_option('posts_per_page')
+            ),
+            $atts,
+            'book_list'
+            
+            );
+        
         $loop_args = array(
             
             'post_type'      => 'book',
-            'posts_per_page' => 4,
+            'posts_per_page' => $atts['limit'],
             
             );
             
