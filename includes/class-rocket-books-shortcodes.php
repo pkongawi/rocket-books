@@ -49,8 +49,31 @@ class Rocket_Books_Shortcodes {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		
-        
+        $this->setup_hooks();
 	}
+    
+    /**
+     * Setup action/filter books  
+     */
+    
+    public function setup_hooks() {
+        add_action( 'wp_enqueue_script', array( $this, 'register_style' ) );
+    }
+    
+    /**
+     * Register Placeholder  
+     */
+    
+    public function register_style() {
+      
+      wp_register_style(
+          
+        $this->plugin_name.'-shortcodes',
+        ROCKET_BOOKS_PLUGIN_URL.'public/css/rocket-books-shortcodes.css'
+      
+        );
+      
+    }
     
     /**
      * Shortcode for books list
@@ -59,14 +82,14 @@ class Rocket_Books_Shortcodes {
     public function book_list($atts, $content){
         
         $atts = shortcode_atts(
-            
-            array(
-                'limit' => get_option('posts_per_page')
-            ),
-            $atts,
-            'book_list'
-            
-            );
+				array(
+					'limit'  => get_option( 'posts_per_page' ),
+					'column' => 3,
+					'bgcolor' => '#f6f6f6'
+				),
+				$atts,
+				'book_list'
+			);
         
         $loop_args = array(
             
@@ -76,13 +99,35 @@ class Rocket_Books_Shortcodes {
             );
             
             $loop = new WP_Query($loop_args);
-        
-             /*When using template loader*/
+            
+            $grid_column = rbr_get_column_class( $atts['column'] );
+            
+            //Step 1 : Register a placeholder stylesheet
+            //Step 2 : Build upo CSS 
+            //Step 3 : Add css to placeholder style 
+            //Step 4 : Enqueue Style 
+            
+            $css = ".cpt-cards.cpt-shortcodes .cpt-card{background-color:{$atts['bgcolor']};}";
+            
+            wp_add_inline_style(
+                
+                $this->plugin_name . '-shortcodes',
+                $css
+                );
+            
+            wp_enqueue_script(
+                $this->plugin_name . '-shortcodes'    
+            );
+            
+            /**
+            *When using template loader
+            */
            // $template_loader = rbr_get_template_loader();
         
         ob_start();
         ?>
-         <div class="cpt-cards three-column" >
+        
+         <div class="cpt-cards cpt-shortcodes <?php echo sanitize_html_class($grid_column); ?>" >
             
 			<?php
 			// Start the Loop.
