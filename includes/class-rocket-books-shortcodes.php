@@ -24,7 +24,13 @@ class Rocket_Books_Shortcodes {
 	 * @access   protected
 	 * @var      string    $plugin_name    The string used to uniquely identify this plugin.
 	 */
-	protected $plugin_name;
+    protected $plugin_name;
+
+    ?/**
+    * Hold all the css for all the shortcodes
+     */
+    
+    protected $shortcode_css;
 
 	/**
 	 * The current version of the plugin.
@@ -57,7 +63,9 @@ class Rocket_Books_Shortcodes {
      */
     
     public function setup_hooks() {
-        add_action( 'wp_enqueue_script', array( $this, 'register_style' ) );
+        add_action( 'wp_enqueue_scripts', array( $this, 'register_style' ) );
+
+        add_action('get_footer', array($this, 'maybe_enqueue_scripts'));
     }
     
     /**
@@ -68,8 +76,8 @@ class Rocket_Books_Shortcodes {
       
       wp_register_style(
           
-        $this->plugin_name.'-shortcodes',
-        ROCKET_BOOKS_PLUGIN_URL.'public/css/rocket-books-shortcodes.css'
+        $this->plugin_name . '-shortcodes',
+        ROCKET_BOOKS_PLUGIN_URL . 'public/css/rocket-books-shortcodes.css'
       
         );
       
@@ -85,7 +93,8 @@ class Rocket_Books_Shortcodes {
 				array(
 					'limit'  => get_option( 'posts_per_page' ),
 					'column' => 3,
-					'bgcolor' => '#f6f6f6'
+					'bgcolor' => '#f6f6f6',
+					'color' => '#ff0000'
 				),
 				$atts,
 				'book_list'
@@ -106,18 +115,8 @@ class Rocket_Books_Shortcodes {
             //Step 2 : Build upo CSS 
             //Step 3 : Add css to placeholder style 
             //Step 4 : Enqueue Style 
-            
-            $css = ".cpt-cards.cpt-shortcodes .cpt-card{background-color:{$atts['bgcolor']};}";
-            
-            wp_add_inline_style(
-                
-                $this->plugin_name . '-shortcodes',
-                $css
-                );
-            
-            wp_enqueue_script(
-                $this->plugin_name . '-shortcodes'    
-            );
+
+            $this->add_css_books_list($atts);
             
             /**
             *When using template loader
@@ -149,7 +148,35 @@ class Rocket_Books_Shortcodes {
         return ob_get_clean();
     }
 
+    /**
+     * Add CSS for books list shortcodes
+     */
 
+     public function add_css_books_list($atts){
+        $css = ".cpt-cards.cpt-shortcodes .cpt-card{background-color:{$atts['bgcolor']};}";
+        $css .= ".cpt-cards.cpt-shortcodes .cpt-card{color:{$atts['color']};}";
+
+        $this->shortcode_css = $this-shortcode_css . $css;
+     }
+
+     /**
+      * Enqueue only when required
+      */
+    public function maybe_enqueue_scripts() {
+        if(!empty($this->shortcode_css)){
+
+            wp_add_inline_style(
+                
+                $this->plugin_name . '-shortcodes',
+                $this->shortcode_css
+                );
+            
+            wp_enqueue_style(
+                $this->plugin_name . '-shortcodes'    
+            );
+
+        }
+    }
 }
 
 }
